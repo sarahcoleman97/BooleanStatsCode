@@ -1,4 +1,8 @@
 All code involving the statistical models and tests is in this repository. Each directory is summarized below, and there is an additional readme in each directory explaining each file.
 
+exampleAnalysis/ - for those wanting to analyze their own data
 fig3/ - simulated data and analysis for the gates derived from k-means clustering
+fig5/ - real data for the two-input gates
+fig6/ - multi-input cases
 figs3/ - simulated data and analysis for all eight two-input logics, when the true beta is 0.45, and Monte Carlo power analysis for these conditions
+figs5/ - Monte Carlo power analyses for the 6 k-means example simulated gates
