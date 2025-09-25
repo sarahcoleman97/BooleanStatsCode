@@ -1,0 +1,8 @@
+analyze_data.R = R script to analyze simulated data (results in sim_data/)
+beta_montercarlo/ = directory with results from the Montecarlo analysis
+fig_s3_ref = reference image of fig_s3 for my own sanity
+figs3stats.csv = results from analyze_data.R
+power_analysis.R = R script to perform power analysis (results in beta_montecarlo/)
+sim_data/ = directory with the raw simulated data
+simulation_conditions.csv = the input group means, used to simulate data
+simulate_data.R = function to simulate data
