@@ -34,24 +34,29 @@ new.cond <- read.csv("simulation_conditions.csv",row.names=1,header=TRUE)
 conditions <- new.cond |> row.names()
 conditions_logics <- c(conditions[1:8], "OR") # specific to this case
 samples <- 2:30
-n.mc <- 1e4 # number of monte carlo simulations
+n.mc <- 10 # number of monte carlo simulations
 variance.values <- 1:10 * 0.1
 or.logic <- c(0, 1, 1, 1)
 
-for (i in 1:length(conditions)){ # for each condition
+conditions_idx <- 1:length(conditions)
+variance_idx <- 1:length(variance.values)
+samples_idx <- 1:length(samples)
+mc_idx <- 1:n.mc
+
+result_top <- parallel::mclapply(conditions_idx, function(i){
   condition <- conditions[i]
   logic <- logic_list[[conditions_logics[[i]]]]
   
-  for (m in 1:length(variance.values)){ # for each variance
+  result_n1 <- parallel::mclapply(variance_idx, function(m){
     variance <- variance.values[m]
     beta.store <- matrix(nrow=length(samples),ncol=n.mc) # init
     p.value <- matrix(nrow=length(samples),ncol=n.mc) # init
     singular.store <- matrix(nrow=length(samples),ncol=n.mc) # init
 
-    for (j in 1:length(samples)){ # for each sample size
+    result_n2 <- parallel::mclapply(samples_idx, function(j){ 
       n <- samples[j]
       
-      for (k in 1:n.mc){ # monte carlo simulation
+      result_n3 <- parallel::mclapply(mc_idx, function(k){ 
         working.df <- simulate_data(new.cond[i,], 
                                  n, 
                                  logic, 
@@ -61,6 +66,7 @@ for (i in 1:length(conditions)){ # for each condition
                                  write.file = FALSE)
         working.lmer <- lmer(Results ~ on + (1|group), data = working.df)
         Singular <- isSingular(working.lmer)
+    
         if (Singular){ # refit without random effects
           working.lmer <- lm(Results ~ on, data = working.df)
           beta.estimate <- coef(working.lmer)[['on']]
@@ -72,28 +78,26 @@ for (i in 1:length(conditions)){ # for each condition
         beta.store[j,k] <- beta.estimate
         p.value[j,k] <- answer$test$pvalues[1]
         singular.store[j,k] <- Singular
-      }
-      
-      cat(paste0('Done with sample size ',n,' in gate number ',
-                 condition,' and variance fraction ',variance,'.\n'))
-    }
-      
+      })
+    })
+    
+    # Write outputs
     beta.store <- data.frame(beta.store, row.names = samples)
-    colnames(beta.store) <- 1:n.mc
+    colnames(beta.store) <- mc_idx
     beta.store <- t(beta.store)
     write.csv(beta.store,paste0('beta_montecarlo/',condition,
                                 '_betas_var_',variance,'.csv'))
       
     p.value <- data.frame(p.value, row.names = samples)
-    colnames(p.value) <- 1:n.mc
+    colnames(p.value) <- mc_idx
     p.value <- t(p.value)
     write.csv(p.value,paste0('beta_montecarlo/',condition,
                              '_pvals_var_',variance,'.csv'))
     
     singularities <- data.frame(singular.store, row.names = samples)
-    colnames(singularities) <- 1:n.mc
+    colnames(singularities) <- mc_idx
     singularities <- t(singularities)
     write.csv(singularities,paste0('beta_montecarlo/',condition,
                                    '_singularities_var_',variance,'.csv'))
-  }
-}
+  })
+})
