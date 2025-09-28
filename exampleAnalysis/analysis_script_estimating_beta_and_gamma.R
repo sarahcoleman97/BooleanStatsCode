@@ -21,6 +21,13 @@ data <- data |>
 # Fit model
 mod <- lmer(Results ~ on + (1|group) - 1, data = data) 
 
+# Check for singular fit
+Singular <- isSingular(mod)
+if (Singular){ # refit without random effects
+  print('Model is singular, refitting without random effects')
+  mod <- lm(Results ~ on, data = working.df)
+}
+
 # Estimate beta (ON - OFF)
 glht_beta <- glht(mod,linfct=c('on1-on0==0')) # equiv to on1/on0 == 1
 est_beta <- glht_beta |> summary()
