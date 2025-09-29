@@ -6,12 +6,6 @@ library(dplyr)
 library(broom) 
 library(msm)
 
-library('lme4') 
-library('lmerTest')
-library('multcomp') 
-library('dplyr') 
-library('msm')
-
 # Read in data
 data <- read.csv('data.csv')
 data <- data |> 

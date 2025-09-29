@@ -96,4 +96,4 @@ all_results <- list(csv_results, xlsx_results_1, xlsx_results_2) |>
   bind_rows()
 
 # Write results to file
-write.csv(all_results, 'fig5stats.csv')
+write.csv(all_results, 'fig4stats.csv')
