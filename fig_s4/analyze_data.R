@@ -1,4 +1,4 @@
-setwd("~/Library/CloudStorage/Box-Box/BooleanStats/BooleanStatsCode/fig_4")
+setwd("~/Library/CloudStorage/Box-Box/BooleanStats/BooleanStatsCode/fig_s4")
 
 library(lme4)
 library(dplyr)
@@ -6,6 +6,8 @@ library(multcomp)
 library(readxl)
 library(tidyr)
 library(broom)
+
+### NEED TO UPDATE THE BELOW WITH CORRECT DATA ###
 
 # Define column names
 colNames <- c("off", "on_1", "on_2", "on_3")
@@ -96,4 +98,4 @@ all_results <- list(csv_results, xlsx_results_1, xlsx_results_2) |>
   bind_rows()
 
 # Write results to file
-write.csv(all_results, 'fig4stats.csv')
+write.csv(all_results, 'figs4stats.csv')

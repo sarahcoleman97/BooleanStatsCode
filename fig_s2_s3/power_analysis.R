@@ -1,4 +1,4 @@
-setwd("~/Library/CloudStorage/Box-Box/BooleanStats/BooleanStatsCode/figs3")
+setwd("~/Library/CloudStorage/Box-Box/BooleanStats/BooleanStatsCode/fig_s2_s3")
 
 set.seed(2024) 
 

@@ -1,4 +1,4 @@
-setwd("~/Library/CloudStorage/Box-Box/BooleanStats/BooleanStatsCode/fig3")
+setwd("~/Library/CloudStorage/Box-Box/BooleanStats/BooleanStatsCode/fig_3")
 
 set.seed(2024)
 library(lme4)

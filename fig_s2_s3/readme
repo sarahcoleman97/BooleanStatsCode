@@ -1,6 +1,6 @@
 analyze_data.R = R script to analyze simulated data (results in sim_data/)
 beta_montercarlo/ = directory with raw results from the Montecarlo analysis for each condition x variance x sample size. No need to go into this!
-figs3stats.csv = statistics for the single simulation, data analyzed are in sim_data/, output by analyze_data.R
+fig_s2_s3stats.csv = statistics for the single simulation, data analyzed are in sim_data/, output by analyze_data.R
 power_analysis.R = R script to perform power analysis (results in beta_montecarlo/)
 sim_data/ = directory with simulated data for plotting (only 1 simulation) and also the betas pulled out from the beta_montecarlo/ directory for each condition and n = 3, 5, 30. 
 simulation_conditions.csv = the input group means, used to simulate data

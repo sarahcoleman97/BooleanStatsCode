@@ -1,4 +1,4 @@
-setwd("~/Library/CloudStorage/Box-Box/BooleanStats/BooleanStatsCode/figs3")
+setwd("~/Library/CloudStorage/Box-Box/BooleanStats/BooleanStatsCode/fig_s2_s3")
 
 set.seed(2024)
 library(lme4)
@@ -76,6 +76,6 @@ if (reanal_data){
       mutate(Condition = condition)
   }) |> bind_rows() |> 
     dplyr::select(Condition, n, isSingular, estimate, conf.low, conf.high, adj.p.value)
-  write.csv(results_df, 'figss3stats.csv', row.names = F)
+  write.csv(results_df, 'figs_s2_s3stats.csv', row.names = F)
 }
 
