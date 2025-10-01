@@ -6,6 +6,7 @@ library(lme4)
 library(effects)
 library(broom)
 library(dplyr)
+library(tidyr)
 library(multcomp)
 
 # Define simulation groups
@@ -53,7 +54,7 @@ prog <- 0
 for (ind_list in group_list){ # doing this as a for loop to reduce overwhelm
   
   # Get groups
-  group <- ind_list[['Row']][['Group']]
+  Group <- ind_list[['Row']][['Group']]
   variance <- ind_list[['Row']][['Variance']] |> as.numeric()
   sample.size <- ind_list[['Row']][['Sample.Size']] |> as.integer()
   working.params.df <- ind_list[['Means']]
@@ -104,7 +105,7 @@ for (ind_list in group_list){ # doing this as a for loop to reduce overwhelm
   }, mc.cores = n_cores) |> bind_rows()
   
   write.csv(result_df, 
-            paste0('beta_montecarlo/',group,
+            paste0('beta_montecarlo/',Group,
                    '_var_',variance,
                    '_n_',sample.size,
                    '.csv'),
@@ -114,21 +115,42 @@ for (ind_list in group_list){ # doing this as a for loop to reduce overwhelm
   setTxtProgressBar(pb, prog)
 }
 
-# # Power analysis figures (need to edit after finish running)
-# 
-# for (group in groups){
-#   files <- paste0('beta_montecarlo/', group, 
-#                   '_var_0.1_n_',samples_select, '.csv')
-#   
-#   df <- lapply(samples_select, function(sample) {
-#     f <- paste0('beta_montecarlo/', group, 
-#                 '_var_0.1_n_',sample, '.csv') 
-#     newColName <- paste0('Beta_n_', sample)
-#     dat <- read.csv(f) |> 
-#       dplyr::select(Beta) |> 
-#       rename_with(~newColName)
-#   }) |> bind_cols()
-#   
-#   write.csv(df, paste0('sim_data/', group, 
-#                        '_betas_', 'n_3_5_30.csv'))
-# }
+# Power analysis figures (easy for plotting)
+var_for_out <- rep(variance.values, each = length(samples))
+sam_for_out <- rep(samples, times = length(variance.values))
+
+p_val_thresh <- 0.05
+
+group_df_list <- vector(mode = 'list', length = length(groups))
+names(group_df_list) <- groups
+
+# go through and read all the files
+for (group in groups){
+  files <- paste0('beta_montecarlo/', group,
+                  '_var_',var_for_out,'_n_',sam_for_out, '.csv')
+  
+  df <- parallel::mclapply(1:length(files), function(idx2){
+    file <- files[[idx2]]
+    var <- var_for_out[[idx2]]
+    sam <- sam_for_out[[idx2]]
+    dat <- read.csv(file) |> 
+      summarise(Power = sum(p.value < p_val_thresh)/n.mc) |> 
+      mutate(Variance = var,
+             Sample.Size = sam)
+  }) |> bind_rows() |> 
+    mutate(Condition = group)
+  
+  group_df_list[[group]] <- df
+} 
+
+# make a final list formatted for prism
+final_df_list <- lapply(group_df_list, function(df){
+  cond <- df |> pull(Condition) |> unique()
+  df_pivot <- df |>
+    pivot_wider(names_from = Variance,
+                values_from = Power) |> 
+    dplyr::select(Sample.Size, all_of(variance.values |> as.character()))
+  write.csv(df_pivot, 
+            paste0('power_analysis/',cond,'_power_for_plotting.csv'),
+            row.names = FALSE)
+})
