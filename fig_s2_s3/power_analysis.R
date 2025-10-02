@@ -50,6 +50,15 @@ comb_list_pt1 <- split(combs, row(combs))
 # Define cores for parallel stuff 
 n_cores <- parallel::detectCores() - 2
 
+colNames <- c('Variance', 'Sample.Size')
+combs <- expand.grid(variance.values, samples,
+                     KEEP.OUT.ATTRS = FALSE, stringsAsFactors = FALSE) |> 
+  rename_with(~colNames) |> 
+  mutate(Condition = 'NAND', Logic = 'NAND') |> 
+  dplyr::select(Condition, Variance, Sample.Size, Logic) |> 
+  as.matrix()
+comb_list_pt1 <- split(combs, row(combs))
+
 condition_list <- parallel::mclapply(comb_list_pt1, function(row){
   
   # Make each row a list, name it
@@ -70,7 +79,6 @@ condition_list <- parallel::mclapply(comb_list_pt1, function(row){
 
 pb <- txtProgressBar(min = 0, max = length(condition_list), style = 3)
 prog <- 0
-
 
 # Final loop (takes a while)
 for (ind_list in condition_list){ # doing this as a for loop to reduce overwhelm
@@ -137,7 +145,7 @@ for (ind_list in condition_list){ # doing this as a for loop to reduce overwhelm
   setTxtProgressBar(pb, prog)
 }
 
-# Pull out the select samples to make it easy to copy into Prism for plotting
+# Pull out the select betas to make it easy to copy into Prism for plotting
 samples_select <- c(3, 5, 30)
 
 for (condition in conditions){
@@ -154,5 +162,6 @@ for (condition in conditions){
   }) |> bind_cols()
   
   write.csv(df, paste0('sim_data/', condition, 
-                       '_betas_', 'n_3_5_30.csv'))
+                       '_betas_', 'n_3_5_30.csv'),
+            row.names = FALSE)
 }
