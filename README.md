@@ -1,7 +1,7 @@
 All code involving the statistical models and tests is in this repository. Each directory is summarized below, and there is an additional readme in each directory explaining each file.
 
 Methodologies:
-clustering_kmeans/ - Python code for k-means clustering (all other code is R). Includes the silhouette score in fig_s1. 
+clustering_kmeans/ - Python code for k-means clustering (all other code is R). Includes the silhouette score in fig_s1.\n
 exampleAnalysis/ - for those wanting to analyze their own data. 
 
 Main text figures:
