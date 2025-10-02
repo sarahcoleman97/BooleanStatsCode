@@ -6,8 +6,8 @@ library(dplyr)
 library(broom)
 library(multcomp)
 
-resim_data <- TRUE
-reanal_data <- TRUE
+resim_data <- FALSE
+reanal_data <- FALSE
 
 source("simulate_data.R")
 
@@ -51,7 +51,30 @@ if (reanal_data){
   write.csv(results_df, 'fig3stats.csv', row.names = F)
 }
 
+# Formatting simulated data for Prism
+n <- 3
+group_mapping <- c('-/-', '+/-', '-/+','+/+')
+sample_idx <- rep(1:n, times = length(group_mapping))
 
-
+results_df <- lapply(groups, function(group){
+  
+  # Define filename
+  fileName <- paste0('sim_data/group_',
+                     group,
+                     '_sample_size_',
+                     sample.size,'_simulated_data.csv')
+  
+  # Read in dataframe
+  df <- read.csv(fileName, header=TRUE, row.names = 1) |> 
+    mutate(Group = group_mapping[group],
+           Replicate = sample_idx) |> 
+    dplyr::select(Results, Group, Replicate) |> 
+    pivot_wider(names_from = Group, values_from = Results) |>
+    dplyr::select(-Replicate)
+  
+  write.csv(df, 
+            paste0('sim_data/group_', group, '_formatted_for_prism.csv'),
+            row.names = F)
+}) 
 
 

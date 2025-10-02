@@ -10,7 +10,12 @@ library(broom)
 colNames <- c("off", "on_1", "on_2", "on_3")
 
 # List all the data in figure 3
-csv_files <- list.files(path = '../fig_3/sim_data/', pattern = '*.csv') 
+csv_files <- list.files(path = '../fig_3/sim_data/', pattern = '*_simulated_data') 
+
+# Some stuff for dataframe reformatting
+n <- 3
+group_mapping <- c('-/-', '+/-', '-/+','+/+')
+sample_idx <- rep(1:n, times = length(group_mapping))
 
 # Analyze the data with different transformations
 csv_results <- lapply(csv_files, function(file){
@@ -22,6 +27,19 @@ csv_results <- lapply(csv_files, function(file){
   df <- read.csv(paste0('../fig_3/sim_data/', file), row.names = 1) |> 
     mutate(Result_turnon = Results/min(Results),
            Result_onratio = Results/max(Results))
+  
+  # Write to csv in wide format for easy plotting
+  df_for_plot <- df |> 
+    mutate(Group = group_mapping[group],
+           Replicate = sample_idx) |> 
+    dplyr::select(Group, Replicate, Results, Result_turnon, Result_onratio) |> 
+    pivot_wider(names_from = Group, 
+                values_from = c(Results, Result_turnon, Result_onratio)) |> 
+    dplyr::select(-Replicate)
+  
+  write.csv(df_for_plot,
+            paste0('transformed_sim_data/group_',Group,'_includes_all_transforms.csv'),
+            row.names = FALSE)
   
   # Unmodified Result column
   mod1 <- lmer(Results ~ on + (1 | group), data = df)
@@ -58,6 +76,6 @@ csv_results <- lapply(csv_files, function(file){
     mutate(Transformation = c('None', 'Turn on', 'On ratio'),
            Group = Group)
 }) |> bind_rows() |> 
-  select(Group, Transformation, estimate, conf.low, conf.high, adj.p.value)
+  dplyr::select(Group, Transformation, estimate, conf.low, conf.high, adj.p.value)
 
 write.csv(csv_results, 'figs10stats.csv', row.names = F)
