@@ -12,7 +12,11 @@ files <- list.files(path = 'data/', pattern = '*.xlsx')
 gate_names <- strsplit(files, '.xlsx')
 
 df_list <- lapply(files, function(file){
-  df <- read_xlsx(paste0('data/',file))
+  if (file == "AlexisnewGate.xlsx"){
+    df <- read_xlsx(paste0('data/',file), skip = 1) # remove on/off indiciation in top column
+  } else {
+    df <- read_xlsx(paste0('data/',file))
+  }
 })
 
 # order is aTc, OC6, IPTG
@@ -25,14 +29,14 @@ colNameToLogics <- list('-/-/-' = '000',
                         'IPTG' = '001',
                         'aTc/OC6/IPTG' = '111')
 
-conditionLogics <- list('000' = 1,
-                       '100' = 0,
-                       '010' = 0,
-                       '001' = 1,
-                       '110' = 0,
-                       '101' = 1,
-                       '011' = 1,
-                       '111' = 1)
+conditionLogics <- list('000' = 1, #-/-/-
+                       '100' = 0, # aTc
+                       '010' = 0, # OC6
+                       '110' = 0, # aTc/OC6
+                       '101' = 1, # aTc/IPTG
+                       '011' = 1, # OC6/IPTG
+                       '001' = 1, # IPTG
+                       '111' = 1) # aTc/OCT/IPTG
 
 xlsx_results <- lapply(1:length(df_list), function(i){
   df <- df_list[[i]]
