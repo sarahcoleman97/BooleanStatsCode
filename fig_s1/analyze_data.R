@@ -78,4 +78,4 @@ csv_results <- lapply(csv_files, function(file){
 }) |> bind_rows() |> 
   dplyr::select(Group, Transformation, estimate, conf.low, conf.high, adj.p.value)
 
-write.csv(csv_results, 'figs10stats.csv', row.names = F)
+write.csv(csv_results, 'fig_s1stats.csv', row.names = F)

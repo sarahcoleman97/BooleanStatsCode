@@ -77,7 +77,7 @@ if (reanal_data){
       mutate(Condition = condition)
   }) |> bind_rows() |> 
     dplyr::select(Condition, n, isSingular, estimate, conf.low, conf.high, adj.p.value)
-  write.csv(results_df, 'fig_s2_s3stats.csv', row.names = F)
+  write.csv(results_df, 'fig_s4_s5stats.csv', row.names = F)
 }
 
 # Formatting simulated data for Prism
