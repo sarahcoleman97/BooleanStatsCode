@@ -7,11 +7,11 @@ library(readxl)
 library(tidyr)
 library(broom)
 
-# Reading the .xslx files
-files <- list.files(path = 'data/', pattern = '*.xlsx')
-gate_names <- strsplit(files, '.xlsx')
+# Reading the .xslx files (OLD)
+files_0 <- c("AlexisnewGate.xlsx", "pMulti-poor.xlsx","pMulti-Trimmed.xlsx")
+gate_names_0 <- strsplit(files_0, '.xlsx')
 
-df_list <- lapply(files, function(file){
+df_list_0 <- lapply(files_0, function(file){
   if (file == "AlexisnewGate.xlsx"){
     df <- read_xlsx(paste0('data/',file), skip = 1) # remove on/off indiciation in top column
   } else {
@@ -19,7 +19,20 @@ df_list <- lapply(files, function(file){
   }
 })
 
-# order is aTc, OC6, IPTG
+# Reading the .xlsx file with multiple sheets (new)
+file_1 <- c("3input.xlsx") 
+sheets_1 <- excel_sheets(path = paste0('data/', file_1))
+gate_names_1 <- paste0(strsplit(file_1, '.xlsx'),"_",sheets_1)
+
+df_list_1 <- lapply(sheets_1, function(sheet){
+    df <- read_xlsx(paste0('data/',file_1), sheet = sheet, skip = 1) 
+})
+
+# Combine them
+df_list <- c(df_list_0, df_list_1)
+gate_names <- c(gate_names_0, gate_names_1)
+
+# Define column/condition: order is aTc, OC6, IPTG
 colNameToLogics <- list('-/-/-' = '000',
                         'aTc' = '100',
                         'OC6' = '010',
@@ -29,6 +42,7 @@ colNameToLogics <- list('-/-/-' = '000',
                         'IPTG' = '001',
                         'aTc/OC6/IPTG' = '111')
 
+# Define condition/logic: specific to our system
 conditionLogics <- list('000' = 1, #-/-/-
                        '100' = 0, # aTc
                        '010' = 0, # OC6
